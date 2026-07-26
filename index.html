@@ -259,9 +259,236 @@
   @media (prefers-reduced-motion: reduce){
     *{animation:none !important; transition:none !important;}
   }
+
+  /* =========================================================
+     イントロ演出
+     ========================================================= */
+  html.intro-lock, html.intro-lock body{
+    overflow:hidden;
+    height:100%;
+  }
+
+  #fireIntro{
+    position:fixed;
+    inset:0;
+    z-index:9999;
+    background:#000;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:opacity 1.4s ease;
+  }
+  #fireIntro.intro-hide{
+    opacity:0;
+    pointer-events:none;
+  }
+
+  /* ---- 燃え盛る炎 & 煙草の煙 ---- */
+  .intro-flame-scene{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    opacity:1;
+    transition:opacity 1.6s ease;
+  }
+  .intro-flame-scene.fade-out{ opacity:0; }
+
+  .intro-fire-glow{
+    position:absolute;
+    left:50%;
+    bottom:0;
+    width:min(80vw, 900px);
+    height:min(80vw, 900px);
+    transform:translate(-50%, 32%);
+    background:radial-gradient(circle, rgba(200,29,37,0.38), rgba(200,29,37,0) 65%);
+    filter:blur(4px);
+    animation:fireGlowPulse 1.3s ease-in-out infinite alternate;
+  }
+  @keyframes fireGlowPulse{
+    0%{ opacity:.55; transform:translate(-50%, 32%) scale(1); }
+    100%{ opacity:.9; transform:translate(-50%, 32%) scale(1.09); }
+  }
+
+  .intro-flame{
+    position:relative;
+    width:170px;
+    height:250px;
+    margin-bottom:6vh;
+  }
+  .intro-flame::before,
+  .intro-flame::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    bottom:0;
+    border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;
+    transform:translateX(-50%);
+    mix-blend-mode:screen;
+  }
+  .intro-flame::before{
+    width:150px; height:250px;
+    background:radial-gradient(circle at 50% 82%, #ffe9a8 0%, var(--red) 40%, var(--red-deep) 72%, transparent 100%);
+    animation:flameFlickerOuter 0.9s ease-in-out infinite alternate;
+  }
+  .intro-flame::after{
+    width:96px; height:180px;
+    background:radial-gradient(circle at 50% 85%, #fff2c0 0%, #ff9d3d 55%, transparent 100%);
+    animation:flameFlickerMid 0.7s ease-in-out infinite alternate;
+  }
+  .intro-flame-core{
+    position:absolute;
+    left:50%; bottom:0;
+    width:44px; height:110px;
+    transform:translateX(-50%);
+    border-radius:50% 50% 50% 50% / 62% 62% 38% 38%;
+    background:radial-gradient(circle at 50% 88%, #ffffff 0%, #fff7d6 45%, #ffd36b 80%, transparent 100%);
+    mix-blend-mode:screen;
+    animation:flameFlickerCore 0.55s ease-in-out infinite alternate;
+  }
+  @keyframes flameFlickerOuter{
+    0%{ transform:translateX(-50%) scaleY(1) scaleX(1) rotate(-2.5deg); }
+    50%{ transform:translateX(-54%) scaleY(1.14) scaleX(0.9) rotate(2deg); }
+    100%{ transform:translateX(-46%) scaleY(0.92) scaleX(1.08) rotate(-3deg); }
+  }
+  @keyframes flameFlickerMid{
+    0%{ transform:translateX(-50%) scaleY(1) rotate(2deg); }
+    100%{ transform:translateX(-44%) scaleY(1.16) rotate(-2.5deg); }
+  }
+  @keyframes flameFlickerCore{
+    0%{ transform:translateX(-50%) scaleY(1) rotate(-1.5deg); opacity:.95; }
+    100%{ transform:translateX(-56%) scaleY(1.12) rotate(2deg); opacity:1; }
+  }
+
+  .intro-spark{
+    position:absolute;
+    bottom:40%;
+    left:50%;
+    width:3px; height:3px;
+    border-radius:50%;
+    background:#ffdca0;
+    box-shadow:0 0 6px 2px rgba(255,180,90,0.8);
+    opacity:0;
+    animation:sparkRise linear infinite;
+  }
+  @keyframes sparkRise{
+    0%{ transform:translate(-50%,0) scale(1); opacity:0; }
+    10%{ opacity:1; }
+    100%{ transform:translate(calc(-50% + var(--sx,10px)), -46vh) scale(0.3); opacity:0; }
+  }
+
+  /* 煙草の煙のように、細く揺らぎながら立ちのぼる煙 */
+  .intro-cig-smoke{
+    position:absolute;
+    bottom:58%;
+    left:50%;
+    width:8px;
+    height:180px;
+    border-radius:50%;
+    background:linear-gradient(to top, rgba(205,201,194,0.55), rgba(205,201,194,0));
+    filter:blur(2px);
+    opacity:0;
+    animation:cigSmokeRise linear infinite;
+  }
+  @keyframes cigSmokeRise{
+    0%{ transform:translate(-50%,0) scaleY(0.4) rotate(0deg); opacity:0; filter:blur(2px); width:8px; }
+    10%{ opacity:.5; }
+    35%{ transform:translate(calc(-50% + 14px), -20vh) scaleY(1) rotate(6deg); filter:blur(4px); width:14px; }
+    60%{ transform:translate(calc(-50% - 16px), -42vh) scaleY(1.3) rotate(-8deg); opacity:.32; filter:blur(7px); width:22px; }
+    100%{ transform:translate(calc(-50% + 10px), -78vh) scaleY(1.7) rotate(10deg); opacity:0; filter:blur(12px); width:34px; }
+  }
+
+  /* ---- 格言（文字化け → 浮かび上がる） ---- */
+  .intro-quote-wrap{
+    position:relative;
+    z-index:2;
+    max-width:760px;
+    padding:0 32px;
+    text-align:center;
+  }
+
+  .intro-line{
+    opacity:0;
+    transition:opacity .7s ease;
+  }
+  .intro-line.show{ opacity:1; }
+
+  .intro-quote-main{
+    font-family:'Shippori Mincho B1', serif;
+    font-weight:800;
+    font-size:clamp(1.5rem, 4.6vw, 2.6rem);
+    line-height:1.9;
+    letter-spacing:.06em;
+    text-shadow:0 0 18px rgba(200,29,37,0.35);
+    min-height:2.4em;
+  }
+
+  .intro-quote-sub{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:clamp(.9rem, 2.1vw, 1.15rem);
+    letter-spacing:.1em;
+    color:var(--gold);
+    min-height:1.8em;
+  }
+
+  .g-char{
+    display:inline-block;
+    white-space:pre;
+  }
+  .intro-quote-main .g-char.scrambling{ color:#8f867d; }
+  .intro-quote-main .g-char.settled{ color:var(--text); }
+  .intro-quote-sub .g-char.scrambling{ color:var(--text-dim); opacity:.75; }
+  .intro-quote-sub .g-char.settled{
+    color:var(--gold);
+    text-shadow:0 0 10px rgba(201,162,39,0.35);
+  }
+
+  .intro-skip-hint{
+    position:absolute;
+    left:50%;
+    bottom:6vh;
+    transform:translateX(-50%);
+    z-index:3;
+    margin:0;
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:.78rem;
+    letter-spacing:.12em;
+    color:var(--text-dim);
+    opacity:0;
+    animation:skipHintFade 1s ease forwards;
+    animation-delay:2.2s;
+  }
+  @keyframes skipHintFade{
+    to{ opacity:.55; }
+  }
+
+  /* ---- 読了時の退出アニメーション ---- */
+  .intro-line.dissolve-line .g-char{
+    animation:charDissolve .9s ease forwards;
+  }
+  @keyframes charDissolve{
+    0%{ opacity:1; filter:blur(0); transform:translateY(0); }
+    100%{ opacity:0; filter:blur(10px); transform:translateY(-24px) scale(1.15); }
+  }
 </style>
 </head>
-<body>
+<body class="intro-active">
+
+<div id="fireIntro" aria-hidden="true">
+  <div class="intro-flame-scene" id="introFlameScene">
+    <div class="intro-fire-glow"></div>
+    <div class="intro-flame">
+      <div class="intro-flame-core"></div>
+    </div>
+  </div>
+  <div class="intro-quote-wrap" id="introQuoteWrap">
+    <p class="intro-quote-main intro-line" id="introMain"></p>
+    <p class="intro-quote-sub intro-line" id="introSub"></p>
+  </div>
+  <p class="intro-skip-hint" id="introSkipHint">タップ / クリックでスキップ</p>
+</div>
 
 <div class="embers" id="embers"></div>
 
@@ -354,6 +581,150 @@
   }, {threshold:0.15});
   sections.forEach(s=>io.observe(s));
 </script>
+
+<script>
+(function(){
+  const root = document.documentElement;
+  root.classList.add('intro-lock');
+
+  const intro = document.getElementById('fireIntro');
+  const flameScene = document.getElementById('introFlameScene');
+  const mainEl = document.getElementById('introMain');
+  const subEl = document.getElementById('introSub');
+
+  const MAIN_PHRASES = ['俺は俺だし、お前はお前。', '俺の好きなようにするよ'];
+  const SUB_TEXT = 'The time is always right to do what is right.';
+  const GLITCH_CHARS = 'アイウエオカキクケコサシスセソタチツテト0123456789#%&$@ZXQJVK*+=';
+
+  let ended = false;
+
+  // 火の粉（燃え盛る炎の勢い）
+  (function spawnSparks(){
+    const num = window.innerWidth < 600 ? 10 : 16;
+    for(let i=0;i<num;i++){
+      const s = document.createElement('div');
+      s.className = 'intro-spark';
+      s.style.setProperty('--sx', (Math.random()*80 - 40) + 'px');
+      s.style.left = (50 + (Math.random()*10 - 5)) + '%';
+      s.style.animationDuration = (2 + Math.random()*1.6) + 's';
+      s.style.animationDelay = (Math.random()*2.6) + 's';
+      flameScene.appendChild(s);
+    }
+  })();
+
+  // 煙草の煙のように、細く揺らぎながら立ちのぼる煙
+  (function spawnCigSmoke(){
+    const num = window.innerWidth < 600 ? 3 : 5;
+    for(let i=0;i<num;i++){
+      const s = document.createElement('div');
+      s.className = 'intro-cig-smoke';
+      s.style.left = (50 + (Math.random()*8 - 4)) + '%';
+      s.style.animationDuration = (5.5 + Math.random()*3) + 's';
+      s.style.animationDelay = (Math.random()*3.5) + 's';
+      flameScene.appendChild(s);
+    }
+  })();
+
+  function wait(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+  // 文字化け(スクランブル)から一文字ずつ正しい文字が浮かび上がる演出
+  function glitchReveal(container, text, opts={}){
+    const charInterval = opts.charInterval || 80;
+    const scrambleSpeed = opts.scrambleSpeed || 45;
+    return new Promise(resolve=>{
+      container.innerHTML = '';
+      const spans = [...text].map(ch=>{
+        const span = document.createElement('span');
+        const skip = (ch === ' ' || ch === '、' || ch === '。');
+        span.className = 'g-char ' + (skip ? 'settled' : 'scrambling');
+        span.textContent = ch === ' ' ? '\u00A0' : ch;
+        container.appendChild(span);
+        return {el:span, target:ch, settled:skip};
+      });
+      container.classList.add('show');
+
+      const scrambleTimer = setInterval(()=>{
+        spans.forEach(s=>{
+          if(!s.settled){
+            s.el.textContent = GLITCH_CHARS[Math.floor(Math.random()*GLITCH_CHARS.length)];
+          }
+        });
+      }, scrambleSpeed);
+
+      let i = 0;
+      const revealTimer = setInterval(()=>{
+        while(i < spans.length && spans[i].settled) i++;
+        if(i < spans.length){
+          const s = spans[i];
+          s.settled = true;
+          s.el.textContent = s.target === ' ' ? '\u00A0' : s.target;
+          s.el.classList.remove('scrambling');
+          s.el.classList.add('settled');
+          i++;
+        } else {
+          clearInterval(revealTimer);
+          clearInterval(scrambleTimer);
+          resolve();
+        }
+      }, charInterval);
+    });
+  }
+
+  // 表示した文字が煙のように消えていく
+  function dissolveLine(container, dissolveMs=900){
+    return new Promise(resolve=>{
+      container.classList.add('dissolve-line');
+      setTimeout(()=>{
+        container.classList.remove('show', 'dissolve-line');
+        container.innerHTML = '';
+        resolve();
+      }, dissolveMs);
+    });
+  }
+
+  function endIntro(){
+    if(ended) return;
+    ended = true;
+    intro.classList.add('intro-hide');
+    root.classList.remove('intro-lock');
+    setTimeout(()=>{ intro.remove(); }, 1500);
+  }
+
+  async function timeline(){
+    await wait(3400);                        // 燃え盛る炎と煙草の煙を見せる
+    flameScene.classList.add('fade-out');     // 煙を辿って暗転
+    await wait(1400);
+
+    // メイン格言・一文目
+    await glitchReveal(mainEl, MAIN_PHRASES[0], {charInterval:85});
+    await wait(1200);
+    await dissolveLine(mainEl);
+    await wait(300);
+
+    // メイン格言・二文目（一文目が消えてから表示）
+    await glitchReveal(mainEl, MAIN_PHRASES[1], {charInterval:85});
+    await wait(1300);
+    await dissolveLine(mainEl);
+    await wait(500);
+
+    // サブ格言（メイン格言が完全に消えてから表示）
+    await glitchReveal(subEl, SUB_TEXT, {charInterval:55, scrambleSpeed:40});
+    await wait(1800);
+    await dissolveLine(subEl);
+
+    endIntro();
+  }
+
+  timeline();
+
+  // フェイルセーフ：万一途中で止まっても一定時間で強制的に本編へ
+  setTimeout(endIntro, 24000);
+
+  // クリック/タップでスキップ
+  intro.addEventListener('click', endIntro);
+})();
+</script>
+
 
 </body>
 </html>
